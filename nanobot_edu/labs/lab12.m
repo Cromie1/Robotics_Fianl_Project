@@ -106,7 +106,7 @@ minVals = [mean(avgVals(:,1)), mean(avgVals(:,2)), mean(avgVals(:,3)), ...
     mean(avgVals(:,4)), mean(avgVals(:,5)), mean(avgVals(:,6))];
 
 fprintf('Min Reflectance - one: %.2f, two: %.2f, three: %.2f four: %.2f five: %.2f six: %.2f\n', minVals(1), minVals(2), minVals(3), minVals(4), minVals(5), minVals(6));
-%minReflectance = ['?','?','?','?','?','?']; % Set me to min reflectance 
+minReflectance = [63,54.9,38.5,26.9,25.7,32.5]; % Set me to min reflectance 
                                              % values for each sensor for
                                              % future reference
 
@@ -128,7 +128,7 @@ end
 maxVals = [mean(avgVals(:,1)), mean(avgVals(:,2)), mean(avgVals(:,3)), ...
     mean(avgVals(:,4)), mean(avgVals(:,5)), mean(avgVals(:,6))];
 fprintf('Max Reflectance - one: %.2f, two: %.2f, three: %.2f four: %.2f five: %.2f six: %.2f\n', maxVals(1), maxVals(2), maxVals(3), maxVals(4), maxVals(5), maxVals(6));
-%maxReflectance = ['?','?','?','?','?','?']; % Set me to max reflectance 
+maxReflectance = [679.1,750.10,561.2,593.9,700.4,654.3]; % Set me to max reflectance 
                                              % values for each sensor for
                                              % future reference
 
@@ -149,7 +149,7 @@ nb.initReflectance();
 vals = nb.reflectanceRead();
 
 % Set the motor offset factor (use the value you found earlier)
-mOffScale = '?';
+mOffScale = 1.43;
 
 % TUNING:
 % Start small (ESPECIALLY with the reflectance values, error can range 

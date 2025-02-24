@@ -27,14 +27,14 @@
 
 clc
 clear all
-nb = nanobot('COM47', 115200, 'serial');
+nb = nanobot('COM6', 115200, 'serial');
 
 %% 2. RECORD WHICH ROBOT YOU'RE USING 
 % From now on (for the final project), your group will use the same robot 
 % for consistency.  Record here which robot you are using for future 
 % reference.
 
-% ROBOT = '?'
+% ROBOT = 'R16'
 
 %% 3.  TEST IF ROBOT GOES STRAIGHT (NO LINE FOLLOWING YET)
 % First, make sure the battery pack is plugged in and is on.  If the
@@ -51,15 +51,15 @@ nb = nanobot('COM47', 115200, 'serial');
 % to the control signal of the stronger/weaker motor to even out the speed 
 % difference.
 
-mOffScale = '?'; % Start with 1 so both motors have same duty cycle.
+mOffScale = 1.43; % Start with 1 so both motors have same duty cycle.
 
 % The base duty cycle "speed" you wish to travel 
 % (recommended values are 9 or 10)
-motorBaseSpeed = '?';
+motorBaseSpeed = 10;
 
 % Set the duty cycle of each motor
 m1Duty = mOffScale * motorBaseSpeed;
-m1Duty = motorBaseSpeed;
+m2Duty = motorBaseSpeed;
 
 tic
 % It can be helpful to initialize your motors to a fixed higher duty cycle

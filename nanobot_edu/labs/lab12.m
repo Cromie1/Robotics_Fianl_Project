@@ -155,9 +155,9 @@ mOffScale = 1.43;
 % Start small (ESPECIALLY with the reflectance values, error can range 
 % from zero to several thousand!).
 % Tip: when tuning kd, it must be the opposite sign of kp to damp
-kp = '?';
+kp = .01;
 ki = '?';
-kd = '?';
+kd = .001;
 
 % Basic initialization
 vals = 0;
@@ -169,19 +169,19 @@ derivative = 0;
 % Determine a threshold to detect when white is detected 
 % (will be used as a threshold for all sensors to know if the robot has 
 % lost the line)
-whiteThresh = '?'; % Max value detected for all white
+whiteThresh = 60; % Max value detected for all white
 
 % The base duty cycle "speed" you wish to travel down the line with
 % (recommended values are 9 or 10)
-motorBaseSpeed = '?';
+motorBaseSpeed = 12;
 
 tic
 % It can be helpful to initialize your motors to a fixed higher duty cycle
 % for a very brief moment, just to overcome the gearbox force of static
 % friction so that lower duty cycles don't stall out at the start.
 % (recommendation: 10, with mOffScale if needed)
-nb.setMotor(1, '?');
-nb.setMotor(2, '?');
+nb.setMotor(1, 10);
+nb.setMotor(2, 10);
 pause(0.03);
 while (toc < 5)  % Adjust me if you want to stop your line following 
                  % earlier, or let it run longer.
@@ -213,16 +213,18 @@ while (toc < 5)  % Adjust me if you want to stop your line following
     % where the line is detected. This is similar to the error term we used
     % in the Sensors Line Detection Milestone. (Use the calibrated values 
     % to determine the error.)
-    error = '?';
+    error = (3*calibratedVals(1) + 2*calibratedVals(2) + 1*calibratedVals(3) - ...
+        1*calibratedVals(4) - 2*calibratedVals(5) - 3*calibratedVals(6));
+    
 
     % Calculate I and D terms
     integral = '?';
 
-    derivative = '?';
+    derivative = (error-prevError)/dt;
 
     % Set PID
-    control = '?';
-
+    control = kp*error +kd*derivative;
+    fprintf("control: %d\n", control);
     % STATE CHECKING - stops robot if all sensors read white (lost tracking):
     if (vals(1) < whiteThresh && ...
             vals(2) < whiteThresh && ...
@@ -240,9 +242,26 @@ while (toc < 5)  % Adjust me if you want to stop your line following
         % Remember, we want to travel around a fixed speed down the line,
         % and the control should make minor adjustments that allow the
         % robot to stay centered on the line as it moves.
-        m1Duty = '?';
-        m2Duty = '?';
+        m1Duty = motorBaseSpeed+control;
+        m2Duty = motorBaseSpeed-control;
        
+        if m1Duty > 18
+            m1Duty = 18;
+        end
+
+        if m1Duty < 6
+            m1Duty = 6;
+        end
+        
+        if m2Duty > 18
+            m2Duty = 18;
+        end
+
+        if m2Duty < 6
+            m2Duty = 6;
+        end
+
+
         % If you're doing something with encoders to derive control, you
         % may want to make sure the duty cycles of the motors don't exceed
         % the maximum speed so that your counts stay accurate.

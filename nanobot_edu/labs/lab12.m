@@ -155,9 +155,9 @@ mOffScale = 1.43;
 % Start small (ESPECIALLY with the reflectance values, error can range 
 % from zero to several thousand!).
 % Tip: when tuning kd, it must be the opposite sign of kp to damp
-kp = .01;
+kp = .005;
 ki = '?';
-kd = .001;
+kd = .0005;
 
 % Basic initialization
 vals = 0;
@@ -169,7 +169,7 @@ derivative = 0;
 % Determine a threshold to detect when white is detected 
 % (will be used as a threshold for all sensors to know if the robot has 
 % lost the line)
-whiteThresh = 60; % Max value detected for all white
+whiteThresh = 200; % Max value detected for all white
 
 % The base duty cycle "speed" you wish to travel down the line with
 % (recommended values are 9 or 10)
@@ -213,8 +213,8 @@ while (toc < 5)  % Adjust me if you want to stop your line following
     % where the line is detected. This is similar to the error term we used
     % in the Sensors Line Detection Milestone. (Use the calibrated values 
     % to determine the error.)
-    error = (3*calibratedVals(1) + 2*calibratedVals(2) + 1*calibratedVals(3) - ...
-        1*calibratedVals(4) - 2*calibratedVals(5) - 3*calibratedVals(6));
+    error = (5*calibratedVals(1) + 2*calibratedVals(2) + 1*calibratedVals(3) - ...
+        1*calibratedVals(4) - 2*calibratedVals(5) - 5*calibratedVals(6));
     
 
     % Calculate I and D terms

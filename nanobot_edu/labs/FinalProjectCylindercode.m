@@ -8,11 +8,11 @@
 
 clc
 clear all
-nb = nanobot('COM6', 115200, 'serial');
+nb = nanobot('COM7', 115200, 'serial');
 
 %% Start cylinder following
-nb.initUltrasonic1('A2','A3')
-nb.initUltrasonic2('A4','A5')
+nb.initUltrasonic1('D2','D3')
+nb.initUltrasonic2('D4','D5')
 
 dist = [2, 4, 6, 8, 10, 12, 14, 16, 18, 20, 22, 24, 26, 28, 30]; % in cm
 % Replace the strings below with the appropriate value measured at the
@@ -32,23 +32,62 @@ resolution = .5;
 minRange = 72;
 maxRange = 1489;
 
-pulseVal = nb.ultrasonicRead1();
-cmVal = pulseVal / avgScaleFactor;
+leftcm = nb.ultrasonicRead2() / avgScaleFactor;
+fprintf("Last read: %0.1f cm\n", leftcm);
 
-fprintf("Begin moving forward.")
-nb.setMotor(1,12)
-nb.setMotor(2,12)
 
-while(cmVal > 15)
-    pulseVal = nb.ultrasonicRead1();
-    cmVal = pulseVal / avgScaleFactor;
-    fprintf("%d",cmVal);
+frontcm = nb.ultrasonicRead1() / avgScaleFactor;
+fprintf("Last read: %0.1f cm\n", frontcm);
+
+
+frontcm = nb.ultrasonicRead1() / avgScaleFactor;
+fprintf('Front dist = %i   Left dist = %i\n', frontcm, leftcm);
+
+%pause(.1);
+if (frontcm < 20)
+    % set motors to turn right 90 degrees
+    nb.setMotor(1,-10)
+    nb.setMotor(2,10)
+    leftcm = nb.ultrasonicRead2() / avgScaleFactor;
+    %if left <= 10
+    while leftcm >= 13
+        leftcm = nb.ultrasonicRead2() / avgScaleFactor;
+        pause(0.1);
+    end
+
+    nb.setMotor(1, 10);
+    nb.setMotor(2, 10);
 end
-fprintf("Stop")
+
+
+while (true)
+    
+    leftcm =  nb.ultrasonicRead2()/avgScaleFactor;
+    fprintf("Last read: %0.1f cm\n", leftcm);
+   
+
+    % set motor 2 speed, this stays constant as it's closer to wall
+    % set motor 1 speed, this will change as it will set the steering rate
+
+    if leftcm > 8
+        % set motor 1 speed to increase, this will bring it closer to the
+        % wall
+        nb.setMotor(2, 6);
+
+    else
+        % set motor 1 speed to decrease, this will bring it farther to the
+        % wall
+        nb.setMotor(1,6);
+    end      
+
+    pause(.01);
+    nb.setMotor(1, 10);
+    nb.setMotor(2, 9);
+
+end
+%% stop motor
 nb.setMotor(1,0)
 nb.setMotor(2,0)
-
-
 %% 5. DISCONNECT
 %  Clears the workspace and command window, then
 %  disconnects from the nanobot, freeing up the serial port.

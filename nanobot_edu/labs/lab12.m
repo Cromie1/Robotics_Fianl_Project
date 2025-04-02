@@ -27,7 +27,7 @@
 
 clc
 clear all
-nb = nanobot('COM6', 115200, 'serial');
+nb = nanobot('COM7', 115200, 'serial');
 
 %% 2. RECORD WHICH ROBOT YOU'RE USING 
 % From now on (for the final project), your group will use the same robot 

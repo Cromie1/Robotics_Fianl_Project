@@ -13,7 +13,7 @@ nb = nanobot('COM7', 115200, 'serial');
 maxReflectenceCalibrate(nb);
 minReflectenceCalibrate(nb);
 
-startLineFollowing(nb);
+startwallfollowing(nb);
 
 
 
@@ -207,7 +207,7 @@ function startwallfollowing(nb)
         
         while leftcm >= 13
             leftcm = nb.ultrasonicRead2() / avgScaleFactor;
-            pause(0.1);
+            pause(0.05);
         end
         
         % Move forward

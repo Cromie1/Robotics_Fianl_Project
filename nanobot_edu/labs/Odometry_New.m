@@ -17,6 +17,16 @@ blue = values.blue;
 fprintf('red: %.2f, green: %.2f, blue: %.2f\n', red, green, blue);
 
 %% Move off of color square
+
+
+%% Turn in direction of color
+pause(1);
+
+function rgbRead
+values = nb.colorRead();
+red = values.red;
+blue = values.blue;
+
 nb.setMotor(1, 10);
 nb.setMotor(2, 10);
 
@@ -25,8 +35,6 @@ pause(0.5);
 nb.setMotor(1, 0);
 nb.setMotor(2, 0);
 
-%% Turn in direction of color
-pause(1);
 if(red > blue) % Turn 45 degrees left
 
     nb.setMotor(1, 10);
@@ -105,4 +113,5 @@ else % Turn 45 degrees right
     
     nb.setMotor(1, 0);
     nb.setMotor(2, 0);
+end
 end

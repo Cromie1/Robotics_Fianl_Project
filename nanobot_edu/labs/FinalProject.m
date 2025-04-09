@@ -10,11 +10,12 @@ clear all
 nb = nanobot('COM7', 115200, 'serial');
 
 %% 2. Run program
-startwallfollowing(nb);
+startlinefollowing(nb);
 
 
 
 function startlinefollowing(nb)
+nb.initReflectance();
     % Globals
 min_reflectance = [142,106,94,82,94,142];
 kp = 0.001;
@@ -125,7 +126,7 @@ while (toc < run_time)
 end
 nb.setMotor(1, 0);
 nb.setMotor(2, 0);
-
+end
 
 
 function startwallfollowing(nb)
@@ -218,4 +219,6 @@ function startwallfollowing(nb)
     nb.setMotor(2, 0);
 end
 
-%%stop motor
+%% stop motor
+nb.setMotor(1,0);
+nb.setMotor(2,0);

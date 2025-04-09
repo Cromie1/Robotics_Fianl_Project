@@ -10,156 +10,121 @@ clear all
 nb = nanobot('COM7', 115200, 'serial');
 
 %% 2. Run program
-maxReflectenceCalibrate(nb);
-minReflectenceCalibrate(nb);
-
 startwallfollowing(nb);
 
 
 
-function startLineFollowing(nb)
-    % STARTLINEFOLLOWING Implements line-following using reflectance sensors with PID control
-    %   Input: nb - Handle to the device interface (e.g., robot controller)
-    
-    % Initialize reflectance array
-    nb.initReflectance();
-    
-    % Motor offset factor
-    mOffScale = 1.43;
-    
-    % PID tuning parameters
-    kp = 0.005;    % Proportional gain
-    ki = 0.0001;   % Integral gain
-    kd = 0.0005;   % Derivative gain
-    
-    % Initialize variables
-    prevError = 0;
-    prevTime = 0;
-    integral = 0;
-    
-    % Configuration parameters
-    whiteThresh = 200;     % Threshold for detecting white
-    motorBaseSpeed = 10;   % Base motor speed
-    
-    % Minimum and maximum sensor values (adjust based on your calibration)
-    minVals = [0 0 0 0 0 0];  % Adjust these based on your sensor minimums
-    maxVals = [1000 1000 1000 1000 1000 1000];  % Adjust based on your sensor maximums
-    
-    % Initial motor kick to overcome static friction
-    nb.setMotor(1, 10);
-    nb.setMotor(2, 10);
-    pause(0.03);
-    
-    tic
-    while (toc < 5)  % Runs for 5 seconds
-        % Time step calculation
-        dt = toc - prevTime;
-        prevTime = toc;
-        
-        % Read reflectance sensors
-        vals = nb.reflectanceRead();
-        vals = [vals.one, vals.two, vals.three, vals.four, vals.five, vals.six];
-        
-        % Calibrate sensor readings
-        calibratedVals = zeros(1,6);
-        for i = 1:6
-            calibratedVals(i) = (vals(i) - minVals(i))/(maxVals(i) - minVals(i));
-            if vals(i) < minVals(i)
-                calibratedVals(i) = 0;
-            end
-            if vals(i) > maxVals(i)
-                calibratedVals(i) = maxVals(i);
-            end
-        end
-        
-        % Calculate error term
-        error = (5*calibratedVals(1) + 2*calibratedVals(2) + 1*calibratedVals(3) - ...
-                1*calibratedVals(4) - 2*calibratedVals(5) - 5*calibratedVals(6));
-        
-        % Calculate PID terms
-        integral = integral + error * dt;
-        derivative = (error - prevError) / dt;
-        
-        % Calculate control signal
-        control = kp*error + ki*integral + kd*derivative;
-        fprintf("control: %d\n", control);
-        
-        % Check if line is lost (all sensors detect white)
-        if all(vals < whiteThresh)
-            nb.setMotor(1, 0);
-            nb.setMotor(2, 0);
-            break;
+function startlinefollowing(nb)
+    % Globals
+min_reflectance = [142,106,94,82,94,142];
+kp = 0.001;
+ki = 0;
+kd = 0.0007;
+prev_error = 0;
+prev_time = 0;
+run_time = 40;
+integral = 0;
+derivative = 0;
+max_speed = 10;
+motor_speed_offset = 0.1 * max_speed;
+all_white_threshold = 300;
+
+% Data collection arrays
+times = [];
+errors = [];
+controls = [];
+P_terms = [];
+I_terms = [];
+D_terms = [];
+
+tic
+% To help overcome static friction
+nb.setMotor(1, motor_speed_offset);
+nb.setMotor(2, motor_speed_offset);
+pause(0.03);
+
+counter = 0;
+% In cycles
+back_up_time = 3000;
+
+% Loop
+while (toc < run_time)
+
+    % TIME STEP
+    current_time = toc;
+    dt = current_time - prev_time;
+    prev_time = current_time;
+
+    if counter ~= 0
+        fprintf('backing up\n');
+        if counter == back_up_time
+            counter = 0;
         else
-            % Calculate motor duties
-            m1Duty = motorBaseSpeed + control;
-            m2Duty = motorBaseSpeed - control;
-            
-            % Limit motor duties
-            m1Duty = max(min(m1Duty, 18), 6);
-            m2Duty = max(min(m2Duty, 18), 6);
-            
-            % Set motor speeds
-            nb.setMotor(1, m1Duty);
-            nb.setMotor(2, m2Duty);
+            counter = counter + 1;
         end
-        
-        prevError = error;
+    else
+
+    
+
+    % Read sensor values
+    valss = nb.reflectanceRead();
+    
+    vals = [valss.one, valss.two, valss.three, valss.four, valss.five, valss.six];
+    calibratedVals = zeros(1,6);
+    
+    % Calibrate sensor readings, min is 0
+    for i = 1:6
+        calibratedVals(i) = max(vals(i) - min_reflectance(i), 0);
+    end 
+   
+    % Calculate error, will range from -2500 to 2500
+    weighted_sum = dot(calibratedVals, [0, 1000, 2000, 3000, 4000, 5000]);
+    error = weighted_sum / sum(calibratedVals) - 2500;
+
+    % Print values of sensors after adjusting
+    %fprintf('one: %.2f, two: %.2f, three: %.2f four: %.2f five: %.2f six: %.2f\n',calibratedVals.one, calibratedVals.two, calibratedVals.three, calibratedVals.four, calibratedVals.five, calibratedVals.six);
+    fprintf('error: %.2f\n', error);
+
+    % Calculate position error
+    if sum(calibratedVals) <= all_white_threshold
+        fprintf('All sensors on white\n');
+        if error <= 0 
+            nb.setMotor(2, -9);
+            
+        else
+            nb.setMotor(1, -9);
+        end
+
+        counter = 1;
+        continue;
     end
     
-    % Stop motors when done
-    nb.setMotor(1, 0);
-    nb.setMotor(2, 0);
+    % Calculate PID stuff
+    integral = integral + error * dt;
+    derivative = (error - prev_error) / dt;
+    control = kp * error + kd * derivative;
+    fprintf('control: %.2f\n', control);
+
+     % Store data for plotting
+    times = [times, current_time];
+    errors = [errors, error];
+    controls = [controls, control];
+    P_terms = [P_terms, kp * error];
+    I_terms = [I_terms, ki * integral];
+    D_terms = [D_terms, kd * derivative];
+
+    motor1_current_speed = max(min(max_speed - control, max_speed), 0);
+    motor2_current_speed = max(min(max_speed + control, max_speed), 0);
+
+    nb.setMotor(2, motor2_current_speed);
+    nb.setMotor(1, motor1_current_speed);
+
+    prev_error = error;
+    end
+
 end
-
-
-function maxReflectenceCalibrate(nb)
-% First initialize the reflectance array.
-nb.initReflectance();
-
-%Average a few values
-avgVals = zeros(10, 6);
-for i = 1:10
-    read = nb.reflectanceRead();
-    avgVals(i, 1) = read.one;
-    avgVals(i, 2) = read.two;
-    avgVals(i, 3) = read.three;
-    avgVals(i, 4) = read.four;
-    avgVals(i, 5) = read.five;
-    avgVals(i, 6) = read.six;
-end
-maxVals = [mean(avgVals(:,1)), mean(avgVals(:,2)), mean(avgVals(:,3)), ...
-    mean(avgVals(:,4)), mean(avgVals(:,5)), mean(avgVals(:,6))];
-fprintf('Max Reflectance - one: %.2f, two: %.2f, three: %.2f four: %.2f five: %.2f six: %.2f\n', maxVals(1), maxVals(2), maxVals(3), maxVals(4), maxVals(5), maxVals(6));
-maxReflectance = [679.1,750.10,561.2,593.9,700.4,654.3]; % Set me to max reflectance 
-                                             % values for each sensor for
-                                             % future reference
-end
-
-
-function minReflectenceCalibrate(nb)
-% First initialize the reflectance array.
-nb.initReflectance();
-
-%Average a few values 
-avgVals = zeros(10, 6);
-for i = 1:10
-    read = nb.reflectanceRead();
-    avgVals(i, 1) = read.one;
-    avgVals(i, 2) = read.two;
-    avgVals(i, 3) = read.three;
-    avgVals(i, 4) = read.four;
-    avgVals(i, 5) = read.five;
-    avgVals(i, 6) = read.six;
-end
-minVals = [mean(avgVals(:,1)), mean(avgVals(:,2)), mean(avgVals(:,3)), ...
-    mean(avgVals(:,4)), mean(avgVals(:,5)), mean(avgVals(:,6))];
-
-fprintf('Min Reflectance - one: %.2f, two: %.2f, three: %.2f four: %.2f five: %.2f six: %.2f\n', minVals(1), minVals(2), minVals(3), minVals(4), minVals(5), minVals(6));
-minReflectance = [63,54.9,38.5,26.9,25.7,32.5]; % Set me to min reflectance 
-                                             % values for each sensor for
-                                             % future reference
-end
-
+nb.setMotor(1, 0);
+nb.setMotor(2, 0);
 
 
 

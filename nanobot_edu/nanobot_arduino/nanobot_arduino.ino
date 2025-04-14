@@ -8,7 +8,7 @@
 #include "Adafruit_TCS34725.h"     // Click here to get the library: http://librarymanager/ALL#Adafruit_TCS34725
 
 //////// USER FLAGs /////////
-int sendMode = 0; //0 for serial, 1 for wifi
+int sendMode = 1; //0 for serial, 1 for wifi
 /////////////////////////////
 
 

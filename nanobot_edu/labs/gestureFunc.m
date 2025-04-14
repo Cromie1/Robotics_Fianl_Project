@@ -1,5 +1,5 @@
 
-function gesture(nb)
+function gestureFunc(nb)
 
 filename = "202549_14823_TrainingSet_2Gestures10Trials.mat";                            
 data = importdata(filename);

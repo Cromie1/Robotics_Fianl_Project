@@ -1,6 +1,5 @@
 %% Turn in direction of color
-
-function rgbRead(nb)
+function RGBFunc(nb)
 nb.initColor()
 values = nb.colorRead();
 red = values.red;

@@ -1,4 +1,4 @@
-function turn(direction)
+function turnFunc(direction)
 if direction.equals('right')
     nb.setMotor(1, 20);
     nb.setMotor(2, -10);

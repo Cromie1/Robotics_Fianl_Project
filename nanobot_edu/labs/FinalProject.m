@@ -19,26 +19,49 @@ startwallfollowingFunc(nb);
 
 %% Main loop for track
 %Run course
-if gesture == 1
-    startlinefollowing(nb)
-    startlinefollowing(nb)
-    startwallfollowing(nb)
-    %turn right
-    startlinefollowing(nb) %stop when sees a color
-    startrgb(nb)
-    startlinefollowing(nb)
-    %turn right
-    startlinefollowing(nb)
-else
-    approachWall(nb)
-    startwallfollowing(nb)
-    startlinefollowing(nb)
-    %turn right
-    startlinefollowing(nb) %stop when sees a color
-    startrgb(nb)
-    startlinefollowing(nb)
-    %turn left
-    startlinefollowing(nb)
+clc
+clear all
+
+gesture = gestureFunc;
+% nb = nanobot('COM7', 115200, 'wifi');
+nb = nanobot('COM4', 115200, 'serial');
+
+if isequal(gesture, 0) %does wall following part first
+    fprintf('path 0')
+    startlinefollowingFunc(nb) %starting point
+    approachWallFunc(nb) %starts at line before wall
+    startwallfollowingFunc(nb) %follows wall
+    turnFunc('right', nb) %turn back onto main track
+    startlinefollowingFunc(nb) %goes back to line before wall
+    startlinefollowingFunc(nb) %goes to middle line
+    startlinefollowingFunc(nb) %goes to the right line
+    turnFunc('right', nb) %turns 180
+    turnFunc('right', nb) %turns 180
+    startlinefollowingFunc(nb) %goes to middle
+    turnFunc('left', nb) %turn onto middle path
+    startlinefollowingFunc(nb) %gets to color square
+    RGBFunc(nb) %determine which square to go to and get back to black line
+    startlinefollowingFunc(nb) %go back to main track
+    turnFunc('left', nb) %turn back to start direction
+
+else %does color detecting path first
+    fprintf('path 1')
+    turnFunc('left', nb) %turn onto middle path
+    startlinefollowingFunc(nb) %gets to color square
+    RGBFunc(nb) %determine which square to go to and get back to black line
+    startlinefollowingFunc(nb) %go back to main track
+    turnFunc('left', nb) %turn back to start direction
+    startlinefollowingFunc(nb) %go to line before wall
+    approachWallFunc(nb) %starts at line before wall
+    startwallfollowingFunc(nb) %follows wall
+    turnFunc('right', nb) %turn back onto main track
+    startlinefollowingFunc(nb) %goes back to line before wall
+    startlinefollowingFunc(nb) %goes to middle line
+    startlinefollowingFunc(nb) %goes to the right line
+    turnFunc('right', nb) %turns 180
+    turnFunc('right', nb) %turns 180
+    startlinefollowingFunc(nb) %goes to middle
+
 
 end
 %% stop motor

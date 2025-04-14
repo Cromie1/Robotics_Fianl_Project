@@ -1,5 +1,4 @@
-
-function gestureFunc(nb)
+function [gesture] = gestureFunc
 
 filename = "202549_14823_TrainingSet_2Gestures10Trials.mat";                            
 data = importdata(filename);
@@ -66,11 +65,12 @@ LDAinput(1,3) = std(singleLetter(3,:)); % TRAINING (SO THAT THE TRAINING AND TES
 % Prediction based on NN
 LDAprediction = predict(LDA,LDAinput);
 
-clc
-delete(nb);
-clear('nb');
+
 gesture = LDAprediction -1;
 if gesture == -1
     gesture = 1;
 end
+clc
+delete(nb);
+clear('nb');
 end

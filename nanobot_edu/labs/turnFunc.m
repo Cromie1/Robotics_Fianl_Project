@@ -1,5 +1,5 @@
-function turnFunc(direction)
-if direction.equals('right')
+function turnFunc(direction, nb)
+if isequal(direction, 'right')
     nb.setMotor(1, 20);
     nb.setMotor(2, -10);
     
@@ -7,7 +7,7 @@ if direction.equals('right')
     
     nb.setMotor(1, 0);
     nb.setMotor(2, 0);
-elseif direction.equals('left')
+elseif isequal(direction, 'left')
     nb.setMotor(1, -10);
     nb.setMotor(2, 20);
     

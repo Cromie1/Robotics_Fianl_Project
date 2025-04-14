@@ -1,8 +1,8 @@
 function approachWallFunc(nb)
 
  % Initialize sensors
-    nb.initUltrasonic1('D2','D3');
-    nb.initUltrasonic2('D4','D5');
+    nb.initUltrasonic1('D4','D5');
+    nb.initUltrasonic2('D2','D3');
     nb.initReflectance();  % Added reflectance sensor initialization
     
     % Ultrasonic calibration data
@@ -100,12 +100,12 @@ while (toc < run_time)
     %fprintf('one: %.2f, two: %.2f, three: %.2f four: %.2f five: %.2f six: %.2f\n',calibratedVals.one, calibratedVals.two, calibratedVals.three, calibratedVals.four, calibratedVals.five, calibratedVals.six);
     fprintf('error: %.2f\n', error);
     
-    if(all(vals>=all_black_threshold))
-    nb.setMotor(1,0);
-    nb.setMotor(2,0);
-    fprintf('Black Line\n')
-    return
-    end
+    % if(all(vals>=all_black_threshold))
+    % nb.setMotor(1,0);
+    % nb.setMotor(2,0);
+    % fprintf('Black Line\n')
+    % return
+    % end
     % Calculate position error
     if sum(calibratedVals) <= all_white_threshold
         fprintf('All sensors on white\n');

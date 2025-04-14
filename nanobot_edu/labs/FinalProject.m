@@ -7,11 +7,11 @@
 
 clc
 clear all
-nb = nanobot('COM7', 115200, 'wifi');
+nb = nanobot('COM7', 115200, 'serial');
 
 %% Testing
-startlinefollowingFunc(nb);
-approachWallFunc(nb);
+%startlinefollowingFunc(nb);
+%approachWallFunc(nb);
 startwallfollowingFunc(nb);
 
 

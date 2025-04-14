@@ -3,13 +3,13 @@ function startwallfollowingFunc(nb)
     %   Input: nb - Handle to the device interface (e.g., robot controller)
     
     % Initialize sensors
-    nb.initUltrasonic1('D2','D3');
-    nb.initUltrasonic2('D4','D5');
+    nb.initUltrasonic1('D4','D5');
+    nb.initUltrasonic2('D2','D3');
     nb.initReflectance();  % Added reflectance sensor initialization
     
     % Ultrasonic calibration data
     dist = [2, 4, 6, 8, 10, 12, 14, 16, 18, 20, 22, 24, 26, 28, 30]; % in cm
-    val = [193 225, 341, 433, 600, 720, 860, 935, 1084, 1177, 1333, 1496, 1545, 1658,1794];
+    val = [193, 225, 341, 433, 600, 720, 860, 935, 1084, 1177, 1333, 1496, 1545, 1658,1794];
     
     % Calculate scale factor for ultrasonic sensors
     arraySize = size(dist, 2);
@@ -34,13 +34,13 @@ function startwallfollowingFunc(nb)
     fprintf("Last read: %0.1f cm\n", frontcm);
     
     % Initial obstacle avoidance
-    if (frontcm < 20)
+    if (0 < frontcm && frontcm < 20)
         % Turn right 90 degrees
-        nb.setMotor(1,-10);
-        nb.setMotor(2,10);
+        nb.setMotor(1,-9);
+        nb.setMotor(2,9);
         leftcm = nb.ultrasonicRead2() / avgScaleFactor;
         
-        while leftcm >= 13
+        while (leftcm >= 15 || leftcm == 0)
             leftcm = nb.ultrasonicRead2() / avgScaleFactor;
             pause(0.05);
         end
@@ -69,7 +69,7 @@ function startwallfollowingFunc(nb)
         end
         
         % Wall-following logic
-        if leftcm > 8
+        if (leftcm > 6 || leftcm == 0)
             % Move closer to wall
             nb.setMotor(2, 6);
         else
@@ -79,8 +79,8 @@ function startwallfollowingFunc(nb)
         
         pause(0.01);
         % Default forward motion
-        nb.setMotor(1, 10);
-        nb.setMotor(2, 9);
+        nb.setMotor(1, 13);
+        nb.setMotor(2, 11);
     end
     
     % Ensure motors are stopped

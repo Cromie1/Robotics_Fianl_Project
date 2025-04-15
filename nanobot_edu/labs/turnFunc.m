@@ -1,17 +1,15 @@
 function turnFunc(direction, nb)
 if isequal(direction, 'right')
-    nb.setMotor(1, 20);
-    nb.setMotor(2, -10);
+    nb.setMotor(2, 16);
     
-    pause(0.58);
+    pause(0.5);
     
     nb.setMotor(1, 0);
     nb.setMotor(2, 0);
 elseif isequal(direction, 'left')
-    nb.setMotor(1, -10);
-    nb.setMotor(2, 20);
+    nb.setMotor(1, 20);
     
-    pause(0.58);
+    pause(0.6);
     
     nb.setMotor(1, 0);
     nb.setMotor(2, 0);

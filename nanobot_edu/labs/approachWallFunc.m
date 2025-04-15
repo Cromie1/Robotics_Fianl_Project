@@ -7,7 +7,7 @@ function approachWallFunc(nb)
     
     % Ultrasonic calibration data
     dist = [2, 4, 6, 8, 10, 12, 14, 16, 18, 20, 22, 24, 26, 28, 30]; % in cm
-    val = [193 225, 341, 433, 600, 720, 860, 935, 1084, 1177, 1333, 1496, 1545, 1658,1794];
+    val = [193, 225, 341, 433, 600, 720, 860, 935, 1084, 1177, 1333, 1496, 1545, 1658,1794];
     
     % Calculate scale factor for ultrasonic sensors
     arraySize = size(dist, 2);
@@ -26,25 +26,14 @@ nb.initReflectance();
     % Globals
 min_reflectance = [142,106,94,82,94,142];
 kp = 0.001;
-ki = 0;
 kd = 0.0007;
 prev_error = 0;
 prev_time = 0;
 run_time = 40;
 integral = 0;
-derivative = 0;
-max_speed = 10;
+max_speed = 12;
 motor_speed_offset = 0.1 * max_speed;
 all_white_threshold = 300;
-all_black_threshold = 150;
-
-% Data collection arrays
-times = [];
-errors = [];
-controls = [];
-P_terms = [];
-I_terms = [];
-D_terms = [];
 
 tic
 % To help overcome static friction
@@ -59,10 +48,11 @@ back_up_time = 3000;
 % Loop
 while (toc < run_time)
     frontcm = nb.ultrasonicRead1() / avgScaleFactor;
-    if (0 < frontcm && frontcm < 15)
+    if (0 < frontcm && frontcm < 8)
         nb.setMotor(1,0);
-        nb.setMotor(1,0);
+        nb.setMotor(2,0);
         fprintf('approached Wall \n')
+
         return
     end
     % TIME STEP
@@ -71,7 +61,6 @@ while (toc < run_time)
     prev_time = current_time;
 
     if counter ~= 0
-        fprintf('backing up\n');
         if counter == back_up_time
             counter = 0;
         else
@@ -98,7 +87,7 @@ while (toc < run_time)
 
     % Print values of sensors after adjusting
     %fprintf('one: %.2f, two: %.2f, three: %.2f four: %.2f five: %.2f six: %.2f\n',calibratedVals.one, calibratedVals.two, calibratedVals.three, calibratedVals.four, calibratedVals.five, calibratedVals.six);
-    fprintf('error: %.2f\n', error);
+    %fprintf('error: %.2f\n', error);
     
     % if(all(vals>=all_black_threshold))
     % nb.setMotor(1,0);
@@ -110,26 +99,27 @@ while (toc < run_time)
     if sum(calibratedVals) <= all_white_threshold
         fprintf('All sensors on white\n');
         if error <= 0 
-            nb.setMotor(2, -9);
+            nb.setMotor(2, -11);
             
         else
-            nb.setMotor(1, -9);
+            nb.setMotor(1, -11);
         end
 
         counter = 1;
         continue;
+        
     end
     
     % Calculate PID stuff
     integral = integral + error * dt;
     derivative = (error - prev_error) / dt;
     control = kp * error + kd * derivative;
-    fprintf('control: %.2f\n', control);
+    %fprintf('control: %.2f\n', control);
 
     motor1_current_speed = max(min(max_speed - control, max_speed), 0);
     motor2_current_speed = max(min(max_speed + control, max_speed), 0);
 
-    nb.setMotor(2, motor2_current_speed);
+    nb.setMotor(2, motor2_current_speed - 2);
     nb.setMotor(1, motor1_current_speed);
 
     prev_error = error;

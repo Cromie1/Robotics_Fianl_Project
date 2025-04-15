@@ -3,25 +3,15 @@ nb.initReflectance();
     % Globals
 min_reflectance = [142,106,94,82,94,142];
 kp = 0.001;
-ki = 0;
 kd = 0.0007;
 prev_error = 0;
 prev_time = 0;
 run_time = 40;
 integral = 0;
-derivative = 0;
-max_speed = 10;
+max_speed = 12;
 motor_speed_offset = 0.1 * max_speed;
 all_white_threshold = 300;
 all_black_threshold = 150;
-
-% Data collection arrays
-times = [];
-errors = [];
-controls = [];
-P_terms = [];
-I_terms = [];
-D_terms = [];
 
 tic
 % To help overcome static friction
@@ -42,7 +32,6 @@ while (toc < run_time)
     prev_time = current_time;
 
     if counter ~= 0
-        fprintf('backing up\n');
         if counter == back_up_time
             counter = 0;
         else
@@ -69,7 +58,7 @@ while (toc < run_time)
 
     % Print values of sensors after adjusting
     %fprintf('one: %.2f, two: %.2f, three: %.2f four: %.2f five: %.2f six: %.2f\n',calibratedVals.one, calibratedVals.two, calibratedVals.three, calibratedVals.four, calibratedVals.five, calibratedVals.six);
-    fprintf('error: %.2f\n', error);
+    %fprintf('error: %.2f\n', error);
     
     if(all(vals>=all_black_threshold))
     nb.setMotor(1,0);
@@ -77,6 +66,7 @@ while (toc < run_time)
     fprintf('Black Line\n')
     return
     end
+
     % Calculate position error
     if sum(calibratedVals) <= all_white_threshold
         fprintf('All sensors on white\n');
@@ -95,20 +85,13 @@ while (toc < run_time)
     integral = integral + error * dt;
     derivative = (error - prev_error) / dt;
     control = kp * error + kd * derivative;
-    fprintf('control: %.2f\n', control);
+    %fprintf('control: %.2f\n', control);
 
-     % Store data for plotting
-    times = [times, current_time];
-    errors = [errors, error];
-    controls = [controls, control];
-    P_terms = [P_terms, kp * error];
-    I_terms = [I_terms, ki * integral];
-    D_terms = [D_terms, kd * derivative];
 
     motor1_current_speed = max(min(max_speed - control, max_speed), 0);
     motor2_current_speed = max(min(max_speed + control, max_speed), 0);
 
-    nb.setMotor(2, motor2_current_speed);
+    nb.setMotor(2, motor2_current_speed - 2);
     nb.setMotor(1, motor1_current_speed);
 
     prev_error = error;

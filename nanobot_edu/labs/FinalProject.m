@@ -7,16 +7,19 @@
 
 clc
 clear all
-nb = nanobot('COM7', 115200, 'serial');
+nb = nanobot('COM3', 115200, 'serial');
 
 %% Testing
-%startlinefollowingFunc(nb);
-%approachWallFunc(nb);
+clc
+clear all
+nb = nanobot('COM3', 115200, 'serial');
+startlinefollowingFunc(nb);
+approachWallFunc(nb);
 startwallfollowingFunc(nb);
 
-
-
-
+%% stop motor
+nb.setMotor(1,0);
+nb.setMotor(2,0);
 %% Main loop for track
 %Run course
 clc

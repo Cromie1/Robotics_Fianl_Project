@@ -21,10 +21,7 @@ function startwallfollowingFunc(nb)
     fprintf("The average scale factor is %.3f units/cm\n", avgScaleFactor);
     
     % Sensor parameters
-    resolution = 0.5;
-    minRange = 72;
-    maxRange = 1489;
-    maxReflectanceThresh = 500;  % New threshold for stopping condition
+    maxReflectanceThresh = 400;  % New threshold for stopping condition
     
     % Initial readings
     leftcm = nb.ultrasonicRead2() / avgScaleFactor;
@@ -33,22 +30,29 @@ function startwallfollowingFunc(nb)
     frontcm = nb.ultrasonicRead1() / avgScaleFactor;
     fprintf("Last read: %0.1f cm\n", frontcm);
     
-    % Initial obstacle avoidance
-    if (0 < frontcm && frontcm < 20)
-        % Turn right 90 degrees
-        nb.setMotor(1,-9);
-        nb.setMotor(2,9);
-        leftcm = nb.ultrasonicRead2() / avgScaleFactor;
-        
-        while (leftcm >= 15 || leftcm == 0)
-            leftcm = nb.ultrasonicRead2() / avgScaleFactor;
-            pause(0.05);
-        end
-        
-        % Move forward
-        nb.setMotor(1, 10);
-        nb.setMotor(2, 10);
-    end
+    %turn right
+    nb.setMotor(1, -11 - 1)
+    nb.setMotor(2, 11)
+
+    pause(.6)
+
+    nb.setMotor(1, 0)
+    nb.setMotor(2, 0)
+    pause(.5)
+
+    % % Initial obstacle avoidance
+    % if (0 < frontcm && frontcm < 20)
+    %     leftcm = nb.ultrasonicRead2() / avgScaleFactor;
+    % 
+    %     while (leftcm >= 15 || leftcm == 0)
+    %         leftcm = nb.ultrasonicRead2() / avgScaleFactor;
+    %         pause(0.05);
+    %     end
+    % 
+    %     % Move forward
+    %     nb.setMotor(1, 10);
+    %     nb.setMotor(2, 10);
+    % end
     
     % Main wall-following loop
     while (true)
@@ -65,22 +69,29 @@ function startwallfollowingFunc(nb)
             nb.setMotor(1, 0);
             nb.setMotor(2, 0);
             fprintf("Stopping: All reflectance sensors exceeded %d\n", maxReflectanceThresh);
-            break;
+            return;
         end
         
         % Wall-following logic
-        if (leftcm > 6 || leftcm == 0)
+        if (leftcm > 6 || isequal(leftcm, 0))
             % Move closer to wall
             nb.setMotor(2, 6);
+            nb.setMotor(1, 11 + 2);
+            
+        elseif (leftcm > 30)
+            nb.setMotor(2, 0)
+            nb.setMotor(1, 0)
+
         else
             % Move away from wall
-            nb.setMotor(1, 6);
+            nb.setMotor(1, 6 + 2);
+            nb.setMotor(2, 6);
+            
         end
         
-        pause(0.01);
-        % Default forward motion
-        nb.setMotor(1, 13);
-        nb.setMotor(2, 11);
+        pause(0.05);
+        nb.setMotor(1, 11 + 2)
+        nb.setMotor(2, 11)
     end
     
     % Ensure motors are stopped

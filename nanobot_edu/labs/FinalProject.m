@@ -14,8 +14,8 @@ clc
 clear all
 nb = nanobot('COM3', 115200, 'serial');
 startlinefollowingFunc(nb);
-approachWallFunc(nb);
-startwallfollowingFunc(nb);
+RGBFunc(nb);
+startlinefollowingFunc(nb);
 
 %% stop motor
 nb.setMotor(1,0);
@@ -25,9 +25,9 @@ nb.setMotor(2,0);
 clc
 clear all
 
-gesture = gestureFunc;
-% nb = nanobot('COM7', 115200, 'wifi');
-nb = nanobot('COM4', 115200, 'serial');
+gesture = 0;
+%gesture = gestureFunc;
+nb = nanobot('COM3', 115200, 'serial');
 
 if isequal(gesture, 0) %does wall following part first
     fprintf('path 0')

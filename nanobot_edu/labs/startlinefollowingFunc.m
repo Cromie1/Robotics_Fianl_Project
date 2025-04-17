@@ -8,7 +8,7 @@ prev_error = 0;
 prev_time = 0;
 run_time = 40;
 integral = 0;
-max_speed = 12;
+max_speed = 13;
 motor_speed_offset = 0.1 * max_speed;
 all_white_threshold = 300;
 all_black_threshold = 150;
@@ -63,18 +63,18 @@ while (toc < run_time)
     if(all(vals>=all_black_threshold))
     nb.setMotor(1,0);
     nb.setMotor(2,0);
-    fprintf('Black Line\n')
+    %fprintf('Black Line\n')
     return
     end
 
     % Calculate position error
     if sum(calibratedVals) <= all_white_threshold
-        fprintf('All sensors on white\n');
+        %fprintf('All sensors on white\n');
         if error <= 0 
-            nb.setMotor(2, -9);
+            nb.setMotor(2, -11);
             
         else
-            nb.setMotor(1, -9);
+            nb.setMotor(1, -11-2);
         end
 
         counter = 1;

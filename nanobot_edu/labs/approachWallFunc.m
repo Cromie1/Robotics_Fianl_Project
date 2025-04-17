@@ -31,7 +31,7 @@ prev_error = 0;
 prev_time = 0;
 run_time = 40;
 integral = 0;
-max_speed = 12;
+max_speed = 13;
 motor_speed_offset = 0.1 * max_speed;
 all_white_threshold = 300;
 

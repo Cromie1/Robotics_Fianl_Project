@@ -18,17 +18,17 @@ function startwallfollowingFunc(nb)
         scaleFactorList(i) = val(i)/dist(i); % In [units/cm] (this is the slope)
     end
     avgScaleFactor = mean(scaleFactorList);
-    fprintf("The average scale factor is %.3f units/cm\n", avgScaleFactor);
+    %fprintf("The average scale factor is %.3f units/cm\n", avgScaleFactor);
     
     % Sensor parameters
-    maxReflectanceThresh = 400;  % New threshold for stopping condition
+    maxReflectanceThresh = 350;  % New threshold for stopping condition
     
     % Initial readings
     leftcm = nb.ultrasonicRead2() / avgScaleFactor;
-    fprintf("Last read: %0.1f cm\n", leftcm);
+    %fprintf("Last read: %0.1f cm\n", leftcm);
     
     frontcm = nb.ultrasonicRead1() / avgScaleFactor;
-    fprintf("Last read: %0.1f cm\n", frontcm);
+    %fprintf("Last read: %0.1f cm\n", frontcm);
     
     %turn right
     nb.setMotor(1, -11 - 1)
@@ -58,7 +58,7 @@ function startwallfollowingFunc(nb)
     while (true)
         % Ultrasonic reading
         leftcm = nb.ultrasonicRead2()/avgScaleFactor;
-        fprintf("Last read: %0.1f cm\n", leftcm);
+        %fprintf("Last read: %0.1f cm\n", leftcm);
         
         % Read reflectance sensors
         refVals = nb.reflectanceRead();
@@ -68,7 +68,7 @@ function startwallfollowingFunc(nb)
         if all(refVals > maxReflectanceThresh)
             nb.setMotor(1, 0);
             nb.setMotor(2, 0);
-            fprintf("Stopping: All reflectance sensors exceeded %d\n", maxReflectanceThresh);
+            %fprintf("Stopping: All reflectance sensors exceeded %d\n", maxReflectanceThresh);
             return;
         end
         

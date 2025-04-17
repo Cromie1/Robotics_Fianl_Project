@@ -35,7 +35,7 @@ end
 clear nb singleLetter
 
 % ADD YOUR PORT BELOW (SAME AS AT THE BEGINNING OF THE CODE)
-nb = nanobot('COM4', 115200, 'serial'); %connect
+nb = nanobot('COM9', 115200, 'serial'); %connect
 nb.ledWrite(0); % Turn on the LED to signify the start of recording data
 numreads = 150; % about 2 seconds (on serial); adjust as needed, but we 
                 % will be using a value of 150 for Labs 4 and 5

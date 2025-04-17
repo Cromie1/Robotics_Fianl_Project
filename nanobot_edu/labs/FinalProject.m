@@ -13,9 +13,9 @@ nb = nanobot('COM3', 115200, 'serial');
 clc
 clear all
 nb = nanobot('COM3', 115200, 'serial');
-startlinefollowingFunc(nb);
-RGBFunc(nb);
-startlinefollowingFunc(nb);
+startlinefollowingFunc(nb)
+approachWallFunc(nb)
+startwallfollowingFunc(nb)
 
 %% stop motor
 nb.setMotor(1,0);
@@ -25,8 +25,8 @@ nb.setMotor(2,0);
 clc
 clear all
 
+
 gesture = 0;
-%gesture = gestureFunc;
 nb = nanobot('COM3', 115200, 'serial');
 
 if isequal(gesture, 0) %does wall following part first
@@ -38,8 +38,7 @@ if isequal(gesture, 0) %does wall following part first
     startlinefollowingFunc(nb) %goes back to line before wall
     startlinefollowingFunc(nb) %goes to middle line
     startlinefollowingFunc(nb) %goes to the right line
-    turnFunc('right', nb) %turns 180
-    turnFunc('right', nb) %turns 180
+    turnFunc(180, nb) %turns 180
     startlinefollowingFunc(nb) %goes to middle
     turnFunc('left', nb) %turn onto middle path
     startlinefollowingFunc(nb) %gets to color square
@@ -61,11 +60,8 @@ else %does color detecting path first
     startlinefollowingFunc(nb) %goes back to line before wall
     startlinefollowingFunc(nb) %goes to middle line
     startlinefollowingFunc(nb) %goes to the right line
-    turnFunc('right', nb) %turns 180
-    turnFunc('right', nb) %turns 180
+    turnFunc(180, nb) %turns 180
     startlinefollowingFunc(nb) %goes to middle
-
-
 end
 %% stop motor
 nb.setMotor(1,0);
